@@ -315,7 +315,7 @@ static void touch_event_cb(int fd)
 
 				fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
 				img = fb_read_jpeg_image(jpgs[point]);
-				fb_draw_sidebar(isRecording2, 0, 1, 0);
+				fb_draw_sidebar(isRecording, 0, 1, 0);
 				image_display_init(image_z, img);
 				fb_update();
 			}
