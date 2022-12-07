@@ -48,6 +48,7 @@ typedef struct
 static char *send_to_vosk_server(char *file);
 extern void image_display_init(zoom_image *, fb_image *);
 extern void image_move_zoom(zoom_image *, int);
+extern void draw_image(zoom_image*);
 static void touch_event_cb(int fd);
 static void timer_cb(int);
 
@@ -64,6 +65,7 @@ const double z_times[10] = {0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0};
 int z_cnt = 4;
 
 int isRecording = 0, isRecording2 = 0;
+
 
 int main(int argc, char *argv[])
 {
@@ -159,97 +161,10 @@ void fb_draw_sidebar(int record_p, int yang_p, int jgb_p, int prompt_p)
 	fb_draw_border(0, 200, 100, 1, WHITE);
 }
 
-//初始显示一张图片的时候，将其显示在屏幕中央
-void image_display_init(zoom_image *image_z, fb_image *img)
-{
-	image_z->image = img;
-	image_z->w = img->pixel_w;
-	image_z->h = img->pixel_h;
-	image_z->x = 512 - img->pixel_w / 2;
-	image_z->y = 300 - img->pixel_h / 2;
-	z_cnt = 4;
-	fb_draw_image(image_z->x, image_z->y, image_z->image, BLACK); //绘图
-	return;
-}
 
-//绘制缩放移动过的图片
-void draw_image(zoom_image *image_z)
-{
-	if (image_z->image == NULL)
-		return;
 
-	double ratio_incre = (double)(image_z->image->pixel_w) / (image_z->w);
 
-	int ix = 0;			// image x  实际绘图的图像起始坐标  而x.y代表屏幕上的显示范围
-	int iy = 0;			// image y
-	int w = image_z->w; // draw width
-	int h = image_z->h; // draw height
-	int x = image_z->x;
-	int y = image_z->y;
 
-	if (x < 0)
-	{
-		w += x;
-		ix -= x;
-		x = 0;
-	}
-	if (y < 0)
-	{
-		h += y;
-		iy -= y;
-		y = 0;
-	}
-
-	if (x + w > SCREEN_WIDTH)
-	{
-		w = SCREEN_WIDTH - x;
-	}
-	if (y + h > SCREEN_HEIGHT)
-	{
-		h = SCREEN_HEIGHT - y;
-	}
-	if ((w <= 0) || (h <= 0))
-		return;
-
-	int *buf = _begin_draw(x, y, w, h);
-	int *temp;
-
-	double x3, y3;
-	int x0, y0;
-	for (y0 = y, y3 = iy; y0 < y + h; y0++)
-	{
-		for (x0 = x, x3 = ix; x0 < x + w; x0++)
-		{
-			temp = (int *)(image_z->image->content + ((int)y3) * image_z->image->pixel_w * 4 + ((int)x3) * 4);
-			*(buf + y0 * SCREEN_WIDTH + x0) = *temp;
-			x3 += ratio_incre;
-		}
-		y3 += ratio_incre;
-	}
-
-	return;
-}
-
-//管理图片的位置、缩放倍数信息 并绘制 但是不update
-void image_move_zoom(zoom_image *image_z, int type, int x_offset, int y_offset)
-{
-	switch (type)
-	{
-	case 0: // zoom and move
-		fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-		image_z->w = image_z->image->pixel_w * z_times[z_cnt];
-		image_z->h = image_z->image->pixel_h * z_times[z_cnt];
-		image_z->x += x_offset;
-		image_z->y += y_offset;
-		draw_image(image_z);
-		break;
-	default: // centralize
-		fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-		image_display_init(image_z, image_z->image);
-		break;
-	}
-	return;
-}
 
 static int st = 0;
 static void timer_cb(int period) /*该函数0.5秒执行一次*/
