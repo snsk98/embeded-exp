@@ -68,25 +68,26 @@ int min(int x,int y){
 
 int main(int argc, char *argv[])
 {
-	// audio_record_init(NULL, PCM_SAMPLE_RATE, 1, 16); //单声道，S16采样
+	//audio_record_init(NULL, PCM_SAMPLE_RATE, 1, 16); //单声道，S16采样
 
-	// pcm_info_st pcm_info;
-	// uint8_t *pcm_buf = audio_record(2000, &pcm_info); //录2秒音频
+	//pcm_info_st pcm_info;
+	//printf("录音开始\n");
+	//uint8_t *pcm_buf = audio_record(2000, &pcm_info); //录2秒音频
 
-	// if(pcm_info.sampleRate != PCM_SAMPLE_RATE) { //实际录音采用率不满足要求时 resample
-	// 	uint8_t *pcm_buf2 = pcm_s16_mono_resample(pcm_buf, &pcm_info, PCM_SAMPLE_RATE, &pcm_info);
+	//if(pcm_info.sampleRate != PCM_SAMPLE_RATE) { //实际录音采用率不满足要求时 resample
+	//	uint8_t *pcm_buf2 = pcm_s16_mono_resample(pcm_buf, &pcm_info, PCM_SAMPLE_RATE, &pcm_info);
 	// 	pcm_free_buf(pcm_buf);
 	// 	pcm_buf = pcm_buf2;
-	// }
+	//}
 
-	// pcm_write_wav_file(pcm_buf, &pcm_info, "/tmp/test.wav");
-	// printf("write wav end\n");
+	//pcm_write_wav_file(pcm_buf, &pcm_info, "/tmp/test.wav");
+	//printf("write wav end\n");
 
-	// pcm_free_buf(pcm_buf);
-
-	// char *rev = send_to_vosk_server("/tmp/test.wav");
-	// printf("recv from server: %s\n", rev);
-	// return 0;
+	//pcm_free_buf(pcm_buf);
+	
+	//char *rev = send_to_vosk_server("/tmp/test.wav");
+	//printf("recv from server: %s\n", rev);
+	//return 0;
 
 	fb_init("/dev/fb0");
 	font_init("./font.ttc");
@@ -155,9 +156,9 @@ void fb_draw_sidebar(int record_p, int yang_p, int jgb_p, int prompt_p)
 	// 	fb_draw_text(0, 50, "loading", WHITE);
 	// }
 
-	fb_draw_border(0, 0, 200, 100, WHITE);
-	fb_draw_border(0, 0, 100, 300, WHITE);
-	fb_draw_border(0, 200, 100, 1, WHITE);
+	fb_draw_border(0, 0, 100, 200, WHITE);
+	fb_draw_border(0, 100, 100, 200, WHITE);
+	
 }
 
 
@@ -201,6 +202,7 @@ static void touch_event_cb(int fd)
 		{
 			if (isRecording && isRecording2)
 			{
+				printf("终止录音\n");
 				//已经在录音，这个时候暂停录音
 				isRecording = 0;
 				isRecording2 = 0;
@@ -210,8 +212,7 @@ static void touch_event_cb(int fd)
 				break;
 			}
 			type = -1;
-			printf("\n1秒后开始录制:\n");
-			sleep(1);
+			printf("\n开始录制:\n");
 			//进入录音状态 绘制一些提示
 			fb_draw_rect(1, 1, 98,98, YELLOW);
 			fb_draw_text(2, 50, "RECORD", 24, BLACK);
@@ -219,7 +220,7 @@ static void touch_event_cb(int fd)
 			printf("开始！\n");
 
 			isRecording = 1;
-			uint8_t *pcm_buf = audio_record(4000, &pcm_info); //录4秒音频
+			uint8_t *pcm_buf = audio_record(2000, &pcm_info); //录4秒音频
 
 			if (isRecording == 0)
 			{
@@ -283,7 +284,9 @@ static void touch_event_cb(int fd)
 			}
 			else
 				type = -1;
+			
 			image_move_zoom(image_z, type, x_offset, y_offset,z_times[z_cnt]);
+			fb_draw_sidebar(0,point==0,point==1,0);
 			fb_update();
 			printf("完毕!\n");
 		}
@@ -371,6 +374,7 @@ static void touch_event_cb(int fd)
 		if (finger == 0 && x < 100 && y < 100)
 		{
 			//松开录音键
+			printf("松开录音键\n");
 			isRecording2=1;
 		}
 		break;
