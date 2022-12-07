@@ -47,6 +47,15 @@ int myWrite_nonblock(int fd, void *p, int n);
 #define FB_COLOR_RGBA_8888	2
 #define FB_COLOR_ALPHA_8	3
 
+typedef struct
+{
+	int x;
+	int y;
+	int w;
+	int h;
+	fb_image *image;
+} zoom_image;
+
 typedef struct {
 	int color_type; /* FB_COLOR_XXXX */
 	int pixel_w, pixel_h;

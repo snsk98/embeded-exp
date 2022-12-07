@@ -11,6 +11,8 @@
 #include <sys/mman.h>
 #include <string.h>
 
+#define BLACK FB_COLOR(0, 0, 0)
+
 static int LCD_FB_FD;
 static int *LCD_FB_BUF = NULL;
 static int DRAW_BUF[SCREEN_WIDTH*SCREEN_HEIGHT];
@@ -18,6 +20,7 @@ static int DRAW_BUF[SCREEN_WIDTH*SCREEN_HEIGHT];
 static struct area {
 	int x1, x2, y1, y2;
 } update_area = {0,0,0,0};
+
 
 #define AREA_SET_EMPTY(pa) do {\
 	(pa)->x1 = SCREEN_WIDTH;\
@@ -410,20 +413,19 @@ void image_display_init(zoom_image *image_z, fb_image *img)
 	image_z->h = img->pixel_h;
 	image_z->x = 512 - img->pixel_w / 2;
 	image_z->y = 300 - img->pixel_h / 2;
-	z_cnt = 4;
 	fb_draw_image(image_z->x, image_z->y, image_z->image, BLACK); //绘图
 	return;
 }
 
 //管理图片的位置、缩放倍数信息 并绘制 但是不update
-void image_move_zoom(zoom_image *image_z, int type, int x_offset, int y_offset)
+void image_move_zoom(zoom_image *image_z, int type, int x_offset, int y_offset,double times)
 {
 	switch (type)
 	{
 	case 0: // zoom and move
 		fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
-		image_z->w = image_z->image->pixel_w * z_times[z_cnt];
-		image_z->h = image_z->image->pixel_h * z_times[z_cnt];
+		image_z->w = image_z->image->pixel_w * times;
+		image_z->h = image_z->image->pixel_h * times;
 		image_z->x += x_offset;
 		image_z->y += y_offset;
 		draw_image(image_z);

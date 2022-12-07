@@ -36,18 +36,10 @@
 /*语音识别要求的pcm采样频率*/
 #define PCM_SAMPLE_RATE 16000 /* 16KHz */
 
-typedef struct
-{
-	int x;
-	int y;
-	int w;
-	int h;
-	fb_image *image;
-} zoom_image;
 
 static char *send_to_vosk_server(char *file);
 extern void image_display_init(zoom_image *, fb_image *);
-extern void image_move_zoom(zoom_image *, int);
+extern void image_move_zoom(zoom_image *, int,double);
 extern void draw_image(zoom_image*);
 static void touch_event_cb(int fd);
 static void timer_cb(int);
@@ -58,7 +50,7 @@ static int touch_fd, point, type;
 static char *jpgs[3] = {"./test.jpg", "./jgb.jpg"};
 
 static fb_image *img;
-static zoom_image *image_z;
+extern zoom_image *image_z;
 static pcm_info_st pcm_info;
 
 const double z_times[10] = {0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0};
@@ -205,7 +197,7 @@ static void touch_event_cb(int fd)
 				//已经在录音，这个时候暂停录音
 				isRecording = 0;
 				isRecording2 = 0;
-				fb_draw_rect(1, 1, 99, 99, black);
+				fb_draw_rect(1, 1, 99, 99, BLACK);
 				fb_draw_text(2, 50, "RECORD", 24, WHITE);
 				fb_update();
 				break;
@@ -284,7 +276,7 @@ static void touch_event_cb(int fd)
 			}
 			else
 				type = -1;
-			image_move_zoom(image_z, type, x_offset, y_offset);
+			image_move_zoom(image_z, type, x_offset, y_offset,z_times[z_cnt]);
 			printf("完毕!\n");
 		}
 		else
@@ -300,8 +292,8 @@ static void touch_event_cb(int fd)
 		//图片也做响应移动
 		if (finger == 0)
 		{
-			image_z.x += x - ox[finger];
-			image_z.y += y - oy[finger];
+			image_z->x += x - ox[finger];
+			image_z->y += y - oy[finger];
 			draw_image(image_z);
 			fb_update();
 		}
