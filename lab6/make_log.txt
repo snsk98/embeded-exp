@@ -1,0 +1,61 @@
+gcc -Wall -O2 -I../common/external/include -c -o ../common/graphic.o ../common/graphic.c
+In file included from ../common/graphic.c:1:
+../common/common.h:56:9: error: unknown type name ‘fb_image’
+   56 |         fb_image *image;
+      |         ^~~~~~~~
+../common/graphic.c: In function ‘fb_draw_rect’:
+../common/graphic.c:156:14: warning: unused variable ‘buf’ [-Wunused-variable]
+  156 |         int *buf = _begin_draw(x,y,w,h);
+      |              ^~~
+../common/graphic.c: In function ‘fb_draw_round’:
+../common/graphic.c:192:14: warning: unused variable ‘buf’ [-Wunused-variable]
+  192 |         int *buf = _begin_draw(x,y,1,1);
+      |              ^~~
+../common/graphic.c:187:13: warning: unused variable ‘right’ [-Wunused-variable]
+  187 |         int right = (x+r>SCREEN_WIDTH)?SCREEN_WIDTH:x+r;
+      |             ^~~~~
+../common/graphic.c:186:13: warning: unused variable ‘left’ [-Wunused-variable]
+  186 |         int left = (x-r<0)?0:x-r;
+      |             ^~~~
+../common/graphic.c: In function ‘fb_draw_image’:
+../common/graphic.c:240:13: warning: unused variable ‘ww’ [-Wunused-variable]
+  240 |         int ww;
+      |             ^~
+../common/graphic.c: In function ‘draw_image’:
+../common/graphic.c:355:53: error: request for member ‘pixel_w’ in something not a structure or union
+  355 |         double ratio_incre = (double)(image_z->image->pixel_w) / (image_z->w);
+      |                                                     ^~
+../common/graphic.c:397:54: error: request for member ‘content’ in something not a structure or union
+  397 |                         temp = (int *)(image_z->image->content + ((int)y3) * image_z->image->pixel_w * 4 + ((int)x3) * 4);
+      |                                                      ^~
+../common/graphic.c:397:92: error: request for member ‘pixel_w’ in something not a structure or union
+  397 |                         temp = (int *)(image_z->image->content + ((int)y3) * image_z->image->pixel_w * 4 + ((int)x3) * 4);
+      |                                                                                            ^~
+../common/graphic.c: In function ‘image_display_init’:
+../common/graphic.c:411:24: warning: assignment to ‘int *’ from incompatible pointer type ‘fb_image *’ [-Wincompatible-pointer-types]
+  411 |         image_z->image = img;
+      |                        ^
+../common/graphic.c:416:54: warning: passing argument 3 of ‘fb_draw_image’ from incompatible pointer type [-Wincompatible-pointer-types]
+  416 |         fb_draw_image(image_z->x, image_z->y, image_z->image, BLACK); //绘图
+      |                                               ~~~~~~~^~~~~~~
+      |                                                      |
+      |                                                      int *
+../common/graphic.c:213:44: note: expected ‘fb_image *’ but argument is of type ‘int *’
+  213 | void fb_draw_image(int x, int y, fb_image *image, int color)
+      |                                  ~~~~~~~~~~^~~~~
+../common/graphic.c: In function ‘image_move_zoom’:
+../common/graphic.c:427:44: error: request for member ‘pixel_w’ in something not a structure or union
+  427 |                 image_z->w = image_z->image->pixel_w * times;
+      |                                            ^~
+../common/graphic.c:428:44: error: request for member ‘pixel_h’ in something not a structure or union
+  428 |                 image_z->h = image_z->image->pixel_h * times;
+      |                                            ^~
+../common/graphic.c:435:52: warning: passing argument 2 of ‘image_display_init’ from incompatible pointer type [-Wincompatible-pointer-types]
+  435 |                 image_display_init(image_z, image_z->image);
+      |                                             ~~~~~~~^~~~~~~
+      |                                                    |
+      |                                                    int *
+../common/graphic.c:409:56: note: expected ‘fb_image *’ but argument is of type ‘int *’
+  409 | void image_display_init(zoom_image *image_z, fb_image *img)
+      |                                              ~~~~~~~~~~^~~
+make: *** [../common/rules.mk:24: ../common/graphic.o] Error 1

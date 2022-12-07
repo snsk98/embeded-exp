@@ -39,7 +39,7 @@
 
 static char *send_to_vosk_server(char *file);
 extern void image_display_init(zoom_image *, fb_image *);
-extern void image_move_zoom(zoom_image *, int,double);
+extern void image_move_zoom(zoom_image *, int,int,int,double);
 extern void draw_image(zoom_image*);
 static void touch_event_cb(int fd);
 static void timer_cb(int);
@@ -50,7 +50,7 @@ static int touch_fd, point, type;
 static char *jpgs[3] = {"./test.jpg", "./jgb.jpg"};
 
 static fb_image *img;
-extern zoom_image *image_z;
+static zoom_image *image_z;
 static pcm_info_st pcm_info;
 
 const double z_times[10] = {0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0};
@@ -58,6 +58,13 @@ int z_cnt = 4;
 
 int isRecording = 0, isRecording2 = 0;
 
+int max(int x,int y){
+	return x<y?y:x;
+}
+
+int min(int x,int y){
+	return x<y?x:y;
+}
 
 int main(int argc, char *argv[])
 {
@@ -96,7 +103,7 @@ int main(int argc, char *argv[])
 	audio_record_init(NULL, PCM_SAMPLE_RATE, 1, 16); //单声道，S16采样
 
 	//打开多点触摸设备文件, 返回文件fd
-	touch_fd = touch_init("/dev/input/event1");
+	touch_fd = touch_init("/dev/input/event2");
 	//添加任务, 当touch_fd文件可读时, 会自动调用touch_event_cb函数
 	task_add_file(touch_fd, touch_event_cb);
 	task_add_timer(500, timer_cb);
@@ -165,15 +172,15 @@ static void timer_cb(int period) /*该函数0.5秒执行一次*/
 	if (isRecording)
 	{
 		sprintf(buf, "已录音%d秒……", st++);
-		fb_draw_rect(101, 1, 99, 99, COLOR_BACKGROUND);
+		fb_draw_rect(101, 1, 99, 99,BLACK);
 		// fb_draw_border(TIME_X, TIME_Y, TIME_W, TIME_H, COLOR_TEXT);
-		fb_draw_text(100 + 2, 0 + 50, buf, 24, COLOR_TEXT);
+		fb_draw_text(100 + 2, 0 + 50, buf, 24, WHITE);
 		fb_update();
 	}
 	else
 	{
 		st = 0;
-		fb_draw_rect(101, 1, 99, 99, COLOR_BACKGROUND);
+		fb_draw_rect(101, 1, 99, 99, BLACK);
 		fb_update();
 	}
 	return;
@@ -277,6 +284,7 @@ static void touch_event_cb(int fd)
 			else
 				type = -1;
 			image_move_zoom(image_z, type, x_offset, y_offset,z_times[z_cnt]);
+			fb_update();
 			printf("完毕!\n");
 		}
 		else
@@ -294,6 +302,8 @@ static void touch_event_cb(int fd)
 		{
 			image_z->x += x - ox[finger];
 			image_z->y += y - oy[finger];
+			fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
+			fb_draw_sidebar(isRecording,1,0,0);
 			draw_image(image_z);
 			fb_update();
 		}
@@ -311,15 +321,16 @@ static void touch_event_cb(int fd)
 				//缩小
 				printf("缩小 %lf %lf\n",od,d);
 				z_cnt = max(0, z_cnt - 1);
-				image_move_zoom(image_z, 0, 0, 0);
+				image_move_zoom(image_z, 0, 0, 0,z_times[z_cnt]);
 			}
 			else
 			{
 				//放大
 				printf("放大 %lf %lf\n",od,d);
 				z_cnt = min(9,z_cnt+1);
-				image_move_zoom(image_z,0,0,0);
+				image_move_zoom(image_z,0,0,0,z_times[z_cnt]);
 			}
+			fb_draw_sidebar(isRecording,1,0,0);
 			fb_update();
 		}
 
