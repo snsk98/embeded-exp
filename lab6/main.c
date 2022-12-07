@@ -172,7 +172,7 @@ static void timer_cb(int period) /*该函数0.5秒执行一次*/
 	if (isRecording)
 	{
 		sprintf(buf, "已录音%d秒……", st++);
-		fb_draw_rect(101, 1, 99, 99,BLACK);
+		fb_draw_rect(101, 1, 98,98,BLACK);
 		// fb_draw_border(TIME_X, TIME_Y, TIME_W, TIME_H, COLOR_TEXT);
 		fb_draw_text(100 + 2, 0 + 50, buf, 24, WHITE);
 		fb_update();
@@ -180,7 +180,7 @@ static void timer_cb(int period) /*该函数0.5秒执行一次*/
 	else
 	{
 		st = 0;
-		fb_draw_rect(101, 1, 99, 99, BLACK);
+		fb_draw_rect(101, 1,98,98, BLACK);
 		fb_update();
 	}
 	return;
@@ -204,7 +204,7 @@ static void touch_event_cb(int fd)
 				//已经在录音，这个时候暂停录音
 				isRecording = 0;
 				isRecording2 = 0;
-				fb_draw_rect(1, 1, 99, 99, BLACK);
+				fb_draw_rect(1, 1, 98,98, BLACK);
 				fb_draw_text(2, 50, "RECORD", 24, WHITE);
 				fb_update();
 				break;
@@ -213,7 +213,7 @@ static void touch_event_cb(int fd)
 			printf("\n1秒后开始录制:\n");
 			sleep(1);
 			//进入录音状态 绘制一些提示
-			fb_draw_rect(1, 1, 99, 99, YELLOW);
+			fb_draw_rect(1, 1, 98,98, YELLOW);
 			fb_draw_text(2, 50, "RECORD", 24, BLACK);
 			fb_update();
 			printf("开始！\n");
@@ -286,6 +286,36 @@ static void touch_event_cb(int fd)
 			image_move_zoom(image_z, type, x_offset, y_offset,z_times[z_cnt]);
 			fb_update();
 			printf("完毕!\n");
+		}
+		else if (x <= 100 && y <= 200 && y > 100)
+		{
+			//切换到羊
+			printf("now is sheep, point:%d\n",point);
+			if (point == 1)
+			{
+				point = 0;
+					
+				fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
+				img = fb_read_jpeg_image(jpgs[point]);
+				fb_draw_sidebar(isRecording, 1, 0, 0);
+				image_display_init(image_z, img);
+				fb_update();
+			}
+		}
+		else if (x <= 100 && y <= 300 && y > 200)
+		{
+			printf("now is 金箍棒, point:%d\n",point);
+			//切换到金箍棒
+			if (point == 0)
+			{
+				point = 1;
+
+				fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
+				img = fb_read_jpeg_image(jpgs[point]);
+				fb_draw_sidebar(isRecording2, 0, 1, 0);
+				image_display_init(image_z, img);
+				fb_update();
+			}
 		}
 		else
 		{
