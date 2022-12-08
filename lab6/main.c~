@@ -197,12 +197,12 @@ static void *func_thread_record()
     else if (strcmp(rev, "上移") == 0)
     {
         type = 0;
-        y_offset = -50;
+        y_offset = +50;
     }
     else if (strcmp(rev, "下移") == 0)
     {
         type = 0;
-        y_offset = +50;
+        y_offset = -50;
     }
     else if (strcmp(rev, "恢复") == 0)
     {
